@@ -1,0 +1,1764 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <title>Oyehabla</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no;"/>
+        
+        <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+            <!--
+            <script type="text/javascript" charset="utf-8" src="js/bootstrap.js">
+            </script>-->
+            
+            <script type="text/javascript" charset="utf-8" src="cordova-1.8.0.js">
+            </script>
+            <!-- cordova facebook plugin -->
+            <script src="js/cdv-plugin-fb-connect.js"></script>
+            <!-- facebook js sdk -->
+            <script src="js/facebook_js_sdk.js"></script>
+            <!-- facebook authintication JS SDK. -->
+            <script src="js/auth.js"></script>
+            
+            <link rel="stylesheet" href="css/jquery.mobile-1.0rc1.min.css" />
+            <link rel="stylesheet" href="css/styles.css" />
+            <!--
+            <link rel="stylesheet" href="css/bootstrap-responsive.css"/>
+            <link rel="stylesheet" href="css/bootstrap.css"/>
+            -->
+            <script type="text/javascript" charset="utf-8">
+
+                // If you want to prevent dragging, uncomment this section
+                /*
+                 function preventBehavior(e) 
+                 { 
+                 e.preventDefault(); 
+                 };
+                 document.addEventListener("touchmove", preventBehavior, false);
+                 */
+                
+                //var baseUrl = "http://localhost:8080/QuoteWeb"
+                //var baseUrl = "http://nts.ns0.it:8080/QuoteWeb-0.1"
+                var baseUrl = "http://www.bettinglife.it"
+                
+                var deviceLang
+                
+                function onBodyLoad()
+                {	
+                    
+                    document.addEventListener("deviceready",onDeviceReady,false);
+                }
+                
+                /* When this function is called, PhoneGap has been initialized and is ready to roll */
+                function onDeviceReady() {
+                    
+                    //window.history.back = navigator.app.origHistoryBack; 
+                    
+                    // Language selection
+                    var lang = window.localStorage.getItem("lang");
+                    
+                    if (lang) {
+                        deviceLang = lang
+                    } else {
+                        var locale = navigator.language.split("-"); 
+                        if (locale[0] == 'it') {
+                            deviceLang  = 'it'
+                        } else {
+                            deviceLang  = 'en'
+                        }
+                        
+                        $.mobile.changePage( "#settings", { transition: "slide"} );
+                    }
+                    
+                    localizeText()
+                    
+                    
+                    // listen for the "iAdBannerViewDidLoadAdEvent" that is sent by the iAdPlugin
+                    document.addEventListener("iAdBannerViewDidLoadAdEvent", iAdBannerViewDidLoadAdEventHandler, false);
+                    // listen for the "iAdBannerViewDidFailToReceiveAdWithErrorEvent" that is sent by the iAdPlugin
+                    document.addEventListener("iAdBannerViewDidFailToReceiveAdWithErrorEvent", iAdBannerViewDidFailToReceiveAdWithErrorEventHandler, false);
+                    
+                    var adAtBottom = true; 
+                    setTimeout(function() {
+                               window.plugins.iAdPlugin.prepare(adAtBottom);
+                               }, 1000);
+                    
+                }
+                
+                function iAdBannerViewDidFailToReceiveAdWithErrorEventHandler(evt) {
+                    window.plugins.iAdPlugin.showAd(false);
+                }
+                
+                function iAdBannerViewDidLoadAdEventHandler(evt) {
+                    window.plugins.iAdPlugin.showAd(true);
+                }
+                
+                function isConnected() {		
+                    var networkState = navigator.network.connection.type;
+                    var notConnectedStates = Connection.NONE;
+                    
+                    if (networkState == notConnectedStates) {
+                        return false
+                    }
+                    return true
+                }
+                
+             </script>
+            </head>
+    
+    <body onload="onBodyLoad()">
+        
+        <!-- splash page -->
+        <div class="splash_page" data-role="page">
+               <a href="#welcomepage">
+                 <img src="images/splash.png"/>
+               </a>
+        </div>
+        <!-- welcome page -->
+        <div id="welcomepage" data-role="page">
+            <div class="welcome_image">
+                <img src="images/splashnew2.png"/>
+            </div>
+            <div class="welcome_border"></div>
+            <div class="background_image">
+                <img src="images/background2.png"/>
+            </div>
+            <a href="#login-page">
+            <div class="login_image">
+                <img src="images/loginwelcomewitharrow.png"/>
+            </div>
+            </a>
+            <a href="#registration-page">
+                <div class="register_image">
+                    <img src="images/registerbuttonwitharrow.png"/>
+                </div>
+            </a>
+            <!--<a href="#facebook-page">
+                <div class="facebook_image">
+                    <img src="images/FBbuttonwitharrow.png"/>
+                </div>
+            </a>-->
+            <a onclick="promptLogin()">
+                <div class="facebook_image">
+                    <img src="images/FBbuttonwitharrow.png"/>
+                </div>
+            </a>
+            
+            <div id="right-block">
+                <a onclick="promptLogin()" class="login-button"> 
+                    <span>Login</span>
+                </a>
+                
+            </div>
+            
+        </div>
+        
+        
+            <!--
+            <div class="home_buttons">
+                <a href="#login-page">
+                    <div class="login_button_border">
+                        <div class="login_button_border_inner">
+                            <div class="login_text">Login</div>
+                        </div>
+                    </div>
+                </a>
+                <a href="#registration-page">
+                    <div class="register_button_border">
+                        <div class="register_button_border_inner">
+                            <div class="register_text">Register</div>
+                        </div>
+                    </div>
+                </a>
+                <a href="#facebook-page">
+                    <div class="facebook_button_border">
+                        <div class="facebook_button_border_inner">
+                            <div class="facebook_logo">f</div>
+                            <div class="facebook_text">Facebook Connect</div>
+                        </div>
+                    </div>
+                </a>
+                <br>
+                <br>
+                <br>
+            </div>            
+        </div>
+        -->
+        <!-- login page -->
+        <div id="login-page" data-role="page">
+            <div class="login_header">
+                <div class="login_back_button">
+                    <img src="images/back.png"/>
+                </div> 
+                <div class="login_text">Login</div>
+                <div class="login_BG1">
+                    <img src="images/203-BG.png"/>
+                </div>
+                <div class="login_help">Help</div>
+            </div>
+            <div class="header_border"></div>
+            <!--<div class="oyehabla_login">
+                <img src="images/background.png"/>
+            </div>-->
+            <div class="oyehabla_logo">
+                <img src="images/oyehablalogin.png">
+            </div>
+            <div class="login_form">
+            <form action="form_action.asp">
+                <br />
+                <div class="login_box">
+                    <input type="text" placeholder="Email" style="margin-top:-1px;">    
+                        <input type="password" placeholder="Password"  style="margin-top:-2px;">
+                            </div>
+                <a href="#plaza_page">
+                    <div class="email_login_image">
+                        <img src="images/Loginbuttonnoarrow.png"/>
+                    </div>
+                </a>
+            </form>
+            </div>
+            <!--
+                <form action="form_action.asp">
+                    <br />
+                    <div class="login_box">
+                        <input type="text" placeholder="Email" style="margin-top:-1px;">    
+                        <input type="password" placeholder="Password"  style="margin-top:-2px;">
+                    </div>
+                    <a href="#plaza_page"><input type="button" value="Signin" /></a>
+                </form>
+            </div>-->
+        </div>
+        
+        <!--Registration page -->
+        <div id="registration-page" data-role="page">
+            <div class="registration_header">
+                <div class="registration_back_button">
+                    <img src="images/back.png"/>
+                </div>
+                
+                <div class="registration_logo">
+                    <img src="images/logo.png"/>
+                </div>
+                
+                <div class="registration_BG1">
+                    <img src="images/203-BG.png"/>
+                </div>
+                <div class="registration_help">Help</div>
+            </div>
+            <div class="header_border"></div>
+            <!--<div class="registration_backgroung_page">
+                    <img src="images/background.png"/>
+            </div>-->
+            <div class="registration_form">
+            <br />
+            <div class="registration_box">
+                <input type="text" placeholder="Email" style="margin-top:-1px;">    
+                <input type="password" placeholder="Password"  style="margin-top:-2px;">
+                <input type="password" placeholder="Confirm Password"  style="margin-top:-2px;">
+            </div>
+            
+            <br>
+            <div class="registration_box">
+                <input type="text" placeholder="First Name" style="margin-top:-1px;"/>
+                <input type="text" placeholder="Last Name" style="margin-top:-2px;"/>
+                <input type="text" placeholder="Birthday" style="margin-top:-2px;"/>
+            </div>
+            </div>
+            <div class="registration_upload_photo">
+                <img src="images/camera.png"/>
+            </div>
+        </div>
+
+        
+        <!--plaza page-->
+        <div id="plaza_page" data-role="page">
+            <div class="plaza_header">
+                <div class="plaza_BG">
+                    <img src="images/203-BG.png"/>
+                </div>
+                <div class="plaza_search">
+                    <img src="images/209-search_icon.png"/>
+                </div>
+                <div class="plaza_read_file">
+                    <img src="images/201-paper_stack.png"/>
+                </div>
+                
+                <div class="plaza_header_logo">
+                    <img src="images/logo.png"/>
+                </div>
+                 
+                <div class="plaza_header_user">
+                    <img src="images/202-Friends.png"/>
+                </div>
+                
+                <div class="plaza_header_BG1">
+                    <img src="images/203-BG.png"/>
+                </div>
+                   
+                <div class="plaza_header_settings">
+                    <img src="images/204-list_icon.png"/>
+                </div>
+            </div> 
+            
+
+            <div class="plaza_filter_bar" data-role="content">
+                <div class="plaza_trending_bar">
+                    <div class="trending">Trending</div>
+                </div>
+                <div class="plaza_feature_bar">
+                    <div class="featured">Featured</div>
+                </div>
+                <div class="plaza_new_bar">
+                    <div class="new">New</div>
+                </div>
+            </div>
+            
+            <a href="#appreciate_page">
+                <div class="plaza_post_box" data-role="content">
+                    <div class="set_border">
+                        <div class="post_image">
+                           <img src="images/images.jpg" style="width:52px; height:52px;"/>
+                        </div>
+                    </div>
+            </a>
+                
+                    <div class="post_title">Post Title1</div>
+                    <div class="post_data">This style will give you some room to have more text displayed and ...</div>
+                    <div class="post_box"/>
+                        <div class="post1">JeffDee</div>
+                        <div class="post2">| 2 days ago |</div>
+                        <div class="post3">Sports</div>
+                        <div class="image_star"><img src="images/appreciatefullpost40.png" style="width:15px; height:15px;"/></div>
+                        <div class="post4">22</div>
+                        <div class="image1"><img src="images/commentfullpost40.png" style="width:15px; height:15px;"/></div>
+                        <div class="post5">12</div>
+                    </div>
+                </div> 
+        
+            <div class="plaza_post_box2" data-role="content">
+                <div class="set_border">
+                    <div class="post_image">
+                        <img src="images/images1.jpg" style="width:52px; height:52px;"/>
+                    </div>
+                </div>
+            
+                <div class="post_title">Post Title2</div>
+                <div class="post_data">This style will give you some room to have more text displayed and ...</div>
+                <div class="post_box"/>
+                    <div class="post1">MaryH</div>
+                    <div class="post2">| 2 days ago |</div>
+                    <div class="post3">Career</div>
+                    <div class="image"><img src="images/appreciatefullpost40.png" style="width:16px; height:16px;"/></div>
+                    <div class="post4">22</div>
+                    <div class="image1"><img src="images/commentfullpost40.png" style="width:15px; height:15px;"/></div>
+                    <div class="post5">12</div>
+                </div>
+            </div>
+        <div class="plaza_post_box3" data-role="content">
+            <div class="set_border">
+                <div class="post_image">
+                    <img src="images/einstein.jpg" style="width:52px; height:52px;"/>
+                </div>
+            </div>
+            
+                <div class="post_title">Post Title3</div>
+                <div class="post_data">This style will give you some room to have more text displayed and ...</div>
+            <div class="post_box"/>
+                <div class="post1">MaryH</div>
+                <div class="post2">| 2 days ago |</div>
+                <div class="post3">Career</div>
+                <div class="image"><img src="images/appreciatefullpost40.png" style="width:16px; height:16px;"/></div>
+                <div class="post4">22</div>
+                <div class="image1"><img src="images/commentfullpost40.png" style="width:15px; height:15px;"/></div>
+                <div class="post5">12</div>
+            </div>
+        </div> 
+
+        
+        <div data-role="footer" data-position="fixed" style="margin-top:-50px;margin-bottom:-50px">
+            <div data-role="navbar">
+                <ul>
+                    <li><a href="#plaza_page" data-role="tab" class="ui-btn-active">
+                        <table>
+                            <tr>
+                                <td style="padding-left:10px">
+                                    <img src="images/205-plaza_icon_active.png" width="30" height="25"/></td>
+                            </tr>
+                            <tr>
+                                <td style="padding-left:12px">Plaza</td>
+                            </tr>
+                        </table>
+                    </a></li>
+                    
+                    <li><a href="#habla_page" data-role="tab">
+                        <table>
+                            <tr>
+                                <td style="padding-left:10px">
+                                    <img src="images/206-habla_active.png" width="30" height="25"/></td>
+                            </tr>
+                            <tr>
+                                
+                                <td style="padding-left:12px">Habla</td>
+                            </tr>
+                        </table>
+                    </a></li>
+                    <li><a href="#vida_page" data-role="tab">
+                        <table>
+                            <tr>
+                                <td style="padding-left:10px">
+                                    <img src="images/207-vida.png" width="30" height="25"/></td>
+                            </tr>
+                            <tr>
+                                <td style="padding-left:12px">Vida</td>
+                            </tr>
+                        </table>
+                    </a></li>
+                    <li><a href="#activity_page" data-role="tab">
+                        <table>
+                            <tr>
+                                <td style="padding-left:10px">
+                                    <img src="images/208-activity_active.png" width="30" height="25"/></td>
+                            </tr>
+                            <tr>
+                                <td style="padding-left:12px">Activity</td>
+                            </tr>
+                        </table>
+                    </a></a></li>
+                </ul>
+            </div>
+        </div>
+        </div>
+
+        </div>
+        
+        <!--Habla page-->
+        <div id="habla_page" data-role="page">
+            <div class="header2" data-role="content">
+                <div class="back_button" data-role="content">
+                    <img src="images/back.png" width="48" height="35"/>
+                </div>
+                <div class="read_file2" data-role="content">
+                    <img src="images/201-paper_stack.png" width="30" height="30"/>
+                </div>
+                <div class="logo2" data-role="content">
+                    <img src="images/logo.png" width="120" height="25"/>
+                </div>
+                <div class="user2" data-role="content">
+                    <img src="images/202-Friends.png" width="30" height="30"/>
+                </div>
+                <div class="settings4" data-role="content">
+                    <img src="images/203-BG.png" width="40" height="28"/>
+                </div>
+                <div class="settings5" data-role="content">
+                    <img src="images/204-list_icon.png" width="48" height="28"/>
+                </div>
+            </div>
+            <div class="header_border"></div>
+            <div class="set_border5" data-role="content">
+                <div class="set_border6">
+                    <div class="camera" data-role="content">
+                        <img src="images/86-camera.png" width="25" height="20"/>
+                    </div>
+                </div>
+            </div>
+            <div class="habla_title_field">
+            <input type="text" placeholder="Enter Title Here..."/>
+            </div>
+            <div class="habla_category_field">
+                <input type="text" placeholder="Category"/>
+            </div>
+            <div class="habla_body_field">
+               <textarea cols="20" rows="4" placeholder="Enter Body Copy..."> </textarea>
+            </div>
+            <div class="habla_public_private" data-role="controlgroup" data-type="horizontal"  data-mini="true" data-theme="e">
+            <input type='button' id='btn1' value='Public' data-theme="a">
+            <input type='button' id='btn2' value='Private' data-theme="a">
+                
+            </div>
+            
+             <div class="habla_share">
+                 <h4>SHARE</h4>
+             </div>
+            <div class="habla_fb">
+                <img src="images/fb.jpg" width="40" height="40"/>
+            </div>
+            <div class="habla_twitter">
+                <img src="images/twitter.jpg" width="40" height="40"/>
+            </div>
+            <div class="habla_border">
+                <div class="habla_border_inner">
+                <div class="habla_text">Habla</div>
+                </div>
+            </div>
+            <div data-role="footer" data-position="fixed" style="margin-top:-50px;margin-bottom:-50px">
+                <div data-role="navbar">
+                    <ul>
+                        <li><a href="#plaza_page" data-role="tab">
+                            <table>
+                                <tr>
+                                    <td style="padding-left:10px">
+                                        <img src="images/205-plaza_icon_active.png" width="30" height="25"/></td>
+                                </tr>
+                                <tr>
+                                    <td style="padding-left:12px">Plaza</td>
+                                </tr>
+                            </table>
+                        </a></li>
+                        
+                        <li><a href="#habla_page" data-role="tab" class="ui-btn-active">
+                            <table>
+                                <tr>
+                                    <td style="padding-left:10px">
+                                        <img src="images/206-habla_active.png" width="30" height="25"/></td>
+                                </tr>
+                                <tr>
+                                    
+                                    <td style="padding-left:12px">Habla</td>
+                                </tr>
+                            </table>
+                        </a></li>
+                        <li><a href="#vida_page" data-role="tab">
+                            <table>
+                                <tr>
+                                    <td style="padding-left:10px">
+                                        <img src="images/207-vida.png" width="30" height="25"/></td>
+                                </tr>
+                                <tr>
+                                    <td style="padding-left:12px">Vida</td>
+                                </tr>
+                            </table>
+                        </a></li>
+                        <li><a href="#" data-role="tab">
+                            <table>
+                                <tr>
+                                    <td style="padding-left:10px">
+                                        <img src="images/208-activity_active.png" width="30" height="25"/></td>
+                                </tr>
+                                <tr>
+                                    <td style="padding-left:12px">Activity</td>
+                                </tr>
+                            </table>
+                        </a></a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        </div>
+        
+        <!--Vida page-->
+        <div id="vida_page" data-role="page">
+            <div class="header2" data-role="content">
+                <div class="back_button" data-role="content">
+                    <img src="images/back.png" width="48" height="35"/>
+                </div>
+                <div class="read_file2" data-role="content">
+                    <img src="images/201-paper_stack.png" width="30" height="30"/>
+                </div>
+                <div class="logo2" data-role="content">
+                    <img src="images/logo.png" width="120" height="25"/>
+                </div>
+                <div class="user2" data-role="content">
+                    <img src="images/202-Friends.png" width="30" height="30"/>
+                </div>
+                <div class="settings4" data-role="content">
+                    <img src="images/203-BG.png" width="40" height="28"/>
+                </div>
+                <div class="settings5" data-role="content">
+                    <img src="images/204-list_icon.png" width="48" height="28"/>
+                </div>
+            </div>
+            <div class="header_border"></div>
+            <div class="vida_mainborder">
+                <div class="vida_photo_border">
+                    <div class="vida_photo_inner_border">
+                        <div class="vida_photo_inner_image">
+                            <img src="images/einstein.jpg" width="122" height="103"/>
+                                <div class="vida_photo_footer">
+                                    <div class="vida_photo_footer_text">Einstein</div>
+                                </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <a href="#vida_followers">
+                <div class="vida_followers">
+                    <div class="vida_followers_number">288</div>
+                    <div class="vida_followers_name">Followers</div>
+                </div></a>
+                <a href="#vida_following">
+                <div class="vida_following">
+                    <div class="vida_following_number">128</div>
+                    <div class="vida_following_name">Following</div>
+                </div></a>
+                <a href="#vida_conversations">
+                <div class="vida_conversations">
+                    <div class="vida_conversations_number">12</div>
+                    <div class="vida_conversations_name">Conversations</div>
+                </div></a>
+                <a href="#vida_watching">
+                <div class="vida_watching">
+                    <div class="vida_watching_number">18</div>
+                    <div class="vida_watching_name">Watching</div>
+                </div></a>
+                
+            </div>
+ <div class="text_user_one">
+     <ul data-role="listview">
+         <li>
+             <div>
+                 <div><img src="images/steve.jpg" width="35px" height="35px";/></div>
+                 <div class="vida_user_one">User One</div>
+                 <div class="vida_follow_button">
+                     <div class="vida_follow_name">Follow</div>
+                 </div>
+             </div>
+         </li>
+         <li>
+             <div>
+                 <div><img src="images/steve1.jpg" width="35px" height="35px";/></div>
+                 <div class="vida_user_one">User Two</div>
+                 <div class="vida_follow_button1">
+                     <div class="vida_follow_name1">Unfollow</div>
+                 </div>
+             </div>
+         </li>
+         <li>
+             <div>
+                 <div><img src="images/steve2.jpg" width="35px" height="35px";/></div>
+                 <div class="vida_user_one">Post Title Three</div>
+                 <div class="vida_follow_button">
+                     <div class="vida_follow_name">Follow</div>
+                 </div>
+             </div>
+         </li>
+         <li>
+             <div>
+                 <div><img src="images/images1.jpg" width="35px" height="35px";/></div>
+                 <div class="vida_user_one">Post Title Four</div>
+                 <div class="vida_follow_button">
+                     <div class="vida_follow_name">Follow</div>
+                 </div>
+             </div>
+         </li>
+     </ul>
+ </div>         
+            
+            
+            <div data-role="footer" data-position="fixed" style="margin-top:-50px;margin-bottom:-50px">
+                <div data-role="navbar">
+                    <ul>
+                        <li><a href="#plaza_page" data-role="tab">
+                            <table>
+                                <tr>
+                                    <td style="padding-left:10px">
+                                        <img src="images/205-plaza_icon_active.png" width="30" height="25"/></td>
+                                </tr>
+                                <tr>
+                                    <td style="padding-left:12px">Plaza</td>
+                                </tr>
+                            </table>
+                        </a></li>
+                        
+                        <li><a href="#habla_page" data-role="tab">
+                            <table>
+                                <tr>
+                                    <td style="padding-left:10px">
+                                        <img src="images/206-habla_active.png" width="30" height="25"/></td>
+                                </tr>
+                                <tr>
+                                    
+                                    <td style="padding-left:12px">Habla</td>
+                                </tr>
+                            </table>
+                        </a></li>
+                        <li><a href="#vida_page" data-role="tab"  class="ui-btn-active">
+                            <table>
+                                <tr>
+                                    <td style="padding-left:10px">
+                                        <img src="images/207-vida.png" width="30" height="25"/></td>
+                                </tr>
+                                <tr>
+                                    <td style="padding-left:12px">Vida</td>
+                                </tr>
+                            </table>
+                        </a></li>
+                        <li><a href="#" data-role="tab">
+                            <table>
+                                <tr>
+                                    <td style="padding-left:10px">
+                                        <img src="images/208-activity_active.png" width="30" height="25"/></td>
+                                </tr>
+                                <tr>
+                                    <td style="padding-left:12px">Activity</td>
+                                </tr>
+                            </table>
+                        </a></a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!--Vida followers-->
+        <div id="vida_followers" data-role="page">
+            <div class="header2" data-role="content">
+                <div class="back_button" data-role="content">
+                    <img src="images/back.png" width="48" height="35"/>
+                </div>
+                <div class="read_file2" data-role="content">
+                    <img src="images/201-paper_stack.png" width="30" height="30"/>
+                </div>
+                <div class="logo2" data-role="content">
+                    <img src="images/logo.png" width="120" height="25"/>
+                </div>
+                <div class="user2" data-role="content">
+                    <img src="images/202-Friends.png" width="30" height="30"/>
+                </div>
+                <div class="settings4" data-role="content">
+                    <img src="images/203-BG.png" width="40" height="28"/>
+                </div>
+                <div class="settings5" data-role="content">
+                    <img src="images/204-list_icon.png" width="48" height="28"/>
+                </div>
+            </div>
+            <div class="header_border"></div>
+            <div class="vida_mainborder">
+                <div class="vida_photo_border">
+                    <div class="vida_photo_inner_border">
+                        <div class="vida_photo_inner_image">
+                            <img src="images/einstein.jpg" width="122" height="103"/>
+                            <div class="vida_photo_footer">
+                                <div class="vida_photo_footer_text">Einstein</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <a href="#vida_followers">
+                    <div class="vida_followers">
+                        <div class="vida_followers_number">288</div>
+                        <div class="vida_followers_name">Followers</div>
+                    </div></a>
+                <a href="#vida_following">
+                    <div class="vida_following">
+                        <div class="vida_following_number">128</div>
+                        <div class="vida_following_name">Following</div>
+                    </div></a>
+                <a href="#vida_conversations">
+                    <div class="vida_conversations">
+                        <div class="vida_conversations_number">12</div>
+                        <div class="vida_conversations_name">Conversations</div>
+                    </div></a>
+                <a href="#vida_watching">
+                    <div class="vida_watching">
+                        <div class="vida_watching_number">18</div>
+                        <div class="vida_watching_name">Watching</div>
+                    </div></a>
+                
+            </div>
+            <div class="text_user_one">
+                <ul data-role="listview">
+                    <li>
+                        <div>
+                            <div><img src="images/steve.jpg" width="35px" height="35px";/></div>
+                            <div class="vida_user_one">User One</div>
+                            <div class="vida_follow_button">
+                                <div class="vida_follow_name">Follow</div>
+                            </div>
+                        </div>
+                    </li>
+                    <li>
+                        <div>
+                            <div><img src="images/steve1.jpg" width="35px" height="35px";/></div>
+                            <div class="vida_user_one">User Two</div>
+                            <div class="vida_follow_button1">
+                                <div class="vida_follow_name1">Unfollow</div>
+                            </div>
+                        </div>
+                    </li>
+                    <li>
+                        <div>
+                            <div><img src="images/steve2.jpg" width="35px" height="35px";/></div>
+                            <div class="vida_user_one">Post Title Three</div>
+                            <div class="vida_follow_button">
+                                <div class="vida_follow_name">Follow</div>
+                            </div>
+                        </div>
+                    </li>
+                    <li>
+                        <div>
+                            <div><img src="images/images1.jpg" width="35px" height="35px";/></div>
+                            <div class="vida_user_one">Post Title Four</div>
+                            <div class="vida_follow_button">
+                                <div class="vida_follow_name">Follow</div>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>         
+            
+            
+            <div data-role="footer" data-position="fixed" style="margin-top:-50px;margin-bottom:-50px">
+                <div data-role="navbar">
+                    <ul>
+                        <li><a href="#plaza_page" data-role="tab">
+                            <table>
+                                <tr>
+                                    <td style="padding-left:10px">
+                                        <img src="images/205-plaza_icon_active.png" width="30" height="25"/></td>
+                                </tr>
+                                <tr>
+                                    <td style="padding-left:12px">Plaza</td>
+                                </tr>
+                            </table>
+                        </a></li>
+                        
+                        <li><a href="#habla_page" data-role="tab">
+                            <table>
+                                <tr>
+                                    <td style="padding-left:10px">
+                                        <img src="images/206-habla_active.png" width="30" height="25"/></td>
+                                </tr>
+                                <tr>
+                                    
+                                    <td style="padding-left:12px">Habla</td>
+                                </tr>
+                            </table>
+                        </a></li>
+                        <li><a href="#vida_page" data-role="tab"  class="ui-btn-active">
+                            <table>
+                                <tr>
+                                    <td style="padding-left:10px">
+                                        <img src="images/207-vida.png" width="30" height="25"/></td>
+                                </tr>
+                                <tr>
+                                    <td style="padding-left:12px">Vida</td>
+                                </tr>
+                            </table>
+                        </a></li>
+                        <li><a href="#" data-role="tab">
+                            <table>
+                                <tr>
+                                    <td style="padding-left:10px">
+                                        <img src="images/208-activity_active.png" width="30" height="25"/></td>
+                                </tr>
+                                <tr>
+                                    <td style="padding-left:12px">Activity</td>
+                                </tr>
+                            </table>
+                        </a></a></li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+        
+        <!-- Vida following -->
+        <div id="vida_following" data-role="page">
+            <div class="header2" data-role="content">
+                <div class="back_button" data-role="content">
+                    <img src="images/back.png" width="48" height="35"/>
+                </div>
+                <div class="read_file2" data-role="content">
+                    <img src="images/201-paper_stack.png" width="30" height="30"/>
+                </div>
+                <div class="logo2" data-role="content">
+                    <img src="images/logo.png" width="120" height="25"/>
+                </div>
+                <div class="user2" data-role="content">
+                    <img src="images/202-Friends.png" width="30" height="30"/>
+                </div>
+                <div class="settings4" data-role="content">
+                    <img src="images/203-BG.png" width="40" height="28"/>
+                </div>
+                <div class="settings5" data-role="content">
+                    <img src="images/204-list_icon.png" width="48" height="28"/>
+                </div>
+            </div>
+            <div class="header_border"></div>
+            <div class="vida_mainborder">
+                <div class="vida_photo_border">
+                    <div class="vida_photo_inner_border">
+                        <div class="vida_photo_inner_image">
+                            <img src="images/einstein.jpg" width="122" height="103"/>
+                            <div class="vida_photo_footer">
+                                <div class="vida_photo_footer_text">Einstein</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="vida_followers_inactive">
+                    <div class="vida_followers_number_inactive">288</div>
+                    <div class="vida_followers_name_inactive">Followers</div>
+                </div>
+                
+                    <div class="vida_following_active">
+                        <div class="vida_following_number_active">128</div>
+                        <div class="vida_following_name_active">Following</div>
+                    </div>
+                <div class="vida_conversations">
+                    <div class="vida_conversations_number">12</div>
+                    <div class="vida_conversations_name">Conversations</div>
+                </div>
+                <div class="vida_watching">
+                    <div class="vida_watching_number">18</div>
+                    <div class="vida_watching_name">Watching</div>
+                </div>
+                
+            </div>
+            <div class="text_user_one">
+                <ul data-role="listview">
+                    <li>
+                        <div>
+                            <div><img src="images/steve.jpg" width="35px" height="35px";/></div>
+                            <div class="vida_user_one">User One</div>
+                            <div class="vida_unfollow_button">
+                                <div class="vida_unfollow_name">Unfollow</div>
+                            </div>
+                        </div>
+                    </li>
+                    <li>
+                        <div>
+                            <div><img src="images/steve1.jpg" width="35px" height="35px";/></div>
+                            <div class="vida_user_one">User Two</div>
+                            <div class="vida_unfollow_button">
+                                <div class="vida_unfollow_name">Unfollow</div>
+                            </div>
+                        </div>
+                    </li>
+                    <li>
+                        <div>
+                            <div><img src="images/steve2.jpg" width="35px" height="35px";/></div>
+                            <div class="vida_user_one">Post Title Three</div>
+                            <div class="vida_unfollow_button">
+                                <div class="vida_unfollow_name">Unfollow</div>
+                            </div>
+                        </div>
+                    </li>
+                    <li>
+                        <div>
+                            <div><img src="images/images1.jpg" width="35px" height="35px";/></div>
+                            <div class="vida_user_one">Post Title Four</div>
+                            <div class="vida_unfollow_button">
+                                <div class="vida_unfollow_name">Unfollow</div>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>         
+            
+            
+            <div data-role="footer" data-position="fixed" style="margin-top:-50px;margin-bottom:-50px">
+                <div data-role="navbar">
+                    <ul>
+                        <li><a href="#plaza_page" data-role="tab">
+                            <table>
+                                <tr>
+                                    <td style="padding-left:10px">
+                                        <img src="images/205-plaza_icon_active.png" width="30" height="25"/></td>
+                                </tr>
+                                <tr>
+                                    <td style="padding-left:12px">Plaza</td>
+                                </tr>
+                            </table>
+                        </a></li>
+                        
+                        <li><a href="#habla_page" data-role="tab">
+                            <table>
+                                <tr>
+                                    <td style="padding-left:10px">
+                                        <img src="images/206-habla_active.png" width="30" height="25"/></td>
+                                </tr>
+                                <tr>
+                                    
+                                    <td style="padding-left:12px">Habla</td>
+                                </tr>
+                            </table>
+                        </a></li>
+                        <li><a href="#vida_page" data-role="tab"  class="ui-btn-active">
+                            <table>
+                                <tr>
+                                    <td style="padding-left:10px">
+                                        <img src="images/207-vida.png" width="30" height="25"/></td>
+                                </tr>
+                                <tr>
+                                    <td style="padding-left:12px">Vida</td>
+                                </tr>
+                            </table>
+                        </a></li>
+                        <li><a href="#" data-role="tab">
+                            <table>
+                                <tr>
+                                    <td style="padding-left:10px">
+                                        <img src="images/208-activity_active.png" width="30" height="25"/></td>
+                                </tr>
+                                <tr>
+                                    <td style="padding-left:12px">Activity</td>
+                                </tr>
+                            </table>
+                        </a></a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!--Vida Conversations-->
+        <div id="vida_conversations" data-role="page">
+            <div class="header2" data-role="content">
+                <div class="back_button" data-role="content">
+                    <img src="images/back.png" width="48" height="35"/>
+                </div>
+                <div class="read_file2" data-role="content">
+                    <img src="images/201-paper_stack.png" width="30" height="30"/>
+                </div>
+                <div class="logo2" data-role="content">
+                    <img src="images/logo.png" width="120" height="25"/>
+                </div>
+                <div class="user2" data-role="content">
+                    <img src="images/202-Friends.png" width="30" height="30"/>
+                </div>
+                <div class="settings4" data-role="content">
+                    <img src="images/203-BG.png" width="40" height="28"/>
+                </div>
+                <div class="settings5" data-role="content">
+                    <img src="images/204-list_icon.png" width="48" height="28"/>
+                </div>
+            </div>
+            <div class="header_border"></div>
+            <div class="vida_mainborder">
+                <div class="vida_photo_border">
+                    <div class="vida_photo_inner_border">
+                        <div class="vida_photo_inner_image">
+                            <img src="images/einstein.jpg" width="122" height="103"/>
+                            <div class="vida_photo_footer">
+                                <div class="vida_photo_footer_text">Einstein</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <a href="#">
+                    <div class="vida_followers_inactive">
+                        <div class="vida_followers_number_inactive">288</div>
+                        <div class="vida_followers_name_inactive">Followers</div>
+                    </div></a>
+                <a href="#vida_following">
+                    <div class="vida_following">
+                        <div class="vida_following_number">128</div>
+                        <div class="vida_following_name">Following</div>
+                    </div></a>
+                <a href="#vida_conversations">
+                    <div class="vida_conversations_active">
+                        <div class="vida_conversations_number_active">12</div>
+                        <div class="vida_conversations_name_active">Conversations</div>
+                    </div></a>
+                <div class="vida_watching">
+                    <div class="vida_watching_number">18</div>
+                    <div class="vida_watching_name">Watching</div>
+                </div>
+                
+            </div>
+            <div class="text_user_one">
+                <ul data-role="listview">
+                    <li>
+                        <div>
+                            <div class="vida_userone_photo"><img src="images/steve.jpg" width="35px" height="35px";/></div>
+                            <div class="vida_user_one">Post Title One</div>
+                            <div class="vida_conversation_button">
+                                <div class="vida_conversation_number">128</div>
+                            </div>
+                        </div>
+                    </li>
+                    <li>
+                        <div>
+                            <div><img src="images/steve1.jpg" width="35px" height="35px";/></div>
+                            <div class="vida_user_one">Post Title Two</div>
+                            <div class="vida_conversation_button">
+                                <div class="vida_conversation_number1">46</div>
+                            </div>
+                        </div>
+                    </li>
+                    <li>
+                        <div>
+                            <div><img src="images/steve2.jpg" width="35px" height="35px";/></div>
+                            <div class="vida_user_one">Post Title Three</div>
+                            <div class="vida_conversation_button">
+                                <div class="vida_conversation_number1">38</div>
+                            </div>
+                        </div>
+                    </li>
+                    <li>
+                        <div>
+                            <div><img src="images/images1.jpg" width="35px" height="35px";/></div>
+                            <div class="vida_user_one">Post Title Four</div>
+                            <div class="vida_conversation_button">
+                                <div class="vida_conversation_number1">24</div>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>         
+            
+            
+            <div data-role="footer" data-position="fixed" style="margin-top:-50px;margin-bottom:-50px">
+                <div data-role="navbar">
+                    <ul>
+                        <li><a href="#plaza_page" data-role="tab">
+                            <table>
+                                <tr>
+                                    <td style="padding-left:10px">
+                                        <img src="images/205-plaza_icon_active.png" width="30" height="25"/></td>
+                                </tr>
+                                <tr>
+                                    <td style="padding-left:12px">Plaza</td>
+                                </tr>
+                            </table>
+                        </a></li>
+                        
+                        <li><a href="#habla_page" data-role="tab">
+                            <table>
+                                <tr>
+                                    <td style="padding-left:10px">
+                                        <img src="images/206-habla_active.png" width="30" height="25"/></td>
+                                </tr>
+                                <tr>
+                                    
+                                    <td style="padding-left:12px">Habla</td>
+                                </tr>
+                            </table>
+                        </a></li>
+                        <li><a href="#vida_page" data-role="tab"  class="ui-btn-active">
+                            <table>
+                                <tr>
+                                    <td style="padding-left:10px">
+                                        <img src="images/207-vida.png" width="30" height="25"/></td>
+                                </tr>
+                                <tr>
+                                    <td style="padding-left:12px">Vida</td>
+                                </tr>
+                            </table>
+                        </a></li>
+                        <li><a href="#" data-role="tab">
+                            <table>
+                                <tr>
+                                    <td style="padding-left:10px">
+                                        <img src="images/208-activity_active.png" width="30" height="25"/></td>
+                                </tr>
+                                <tr>
+                                    <td style="padding-left:12px">Activity</td>
+                                </tr>
+                            </table>
+                        </a></a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Vida watching -->
+        <div id="vida_watching" data-role="page">
+            <div class="header2" data-role="content">
+                <div class="back_button" data-role="content">
+                    <img src="images/back.png" width="48" height="35"/>
+                </div>
+                <div class="read_file2" data-role="content">
+                    <img src="images/201-paper_stack.png" width="30" height="30"/>
+                </div>
+                <div class="logo2" data-role="content">
+                    <img src="images/logo.png" width="120" height="25"/>
+                </div>
+                <div class="user2" data-role="content">
+                    <img src="images/202-Friends.png" width="30" height="30"/>
+                </div>
+                <div class="settings4" data-role="content">
+                    <img src="images/203-BG.png" width="40" height="28"/>
+                </div>
+                <div class="settings5" data-role="content">
+                    <img src="images/204-list_icon.png" width="48" height="28"/>
+                </div>
+            </div>
+            <div class="header_border"></div>
+            <div class="vida_mainborder">
+                <div class="vida_photo_border">
+                    <div class="vida_photo_inner_border">
+                        <div class="vida_photo_inner_image">
+                            <img src="images/einstein.jpg" width="122" height="103"/>
+                            <div class="vida_photo_footer">
+                                <div class="vida_photo_footer_text">Einstein</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <a href="#">
+                    <div class="vida_followers_inactive">
+                        <div class="vida_followers_number_inactive">288</div>
+                        <div class="vida_followers_name_inactive">Followers</div>
+                    </div></a>
+                <a href="#vida_following">
+                    <div class="vida_following">
+                        <div class="vida_following_number">128</div>
+                        <div class="vida_following_name">Following</div>
+                    </div></a>
+                <a href="#vida_conversations">
+                    <div class="vida_conversations">
+                        <div class="vida_conversations_number">12</div>
+                        <div class="vida_conversations_name">Conversations</div>
+                    </div></a>
+                <div class="vida_watching_active">
+                    <div class="vida_watching_number_active">18</div>
+                    <div class="vida_watching_name_active">Watching</div>
+                </div>
+                
+            </div>
+            <div class="text_user_one">
+                <ul data-role="listview">
+                    <li>
+                        <div>
+                            <div><img src="images/steve.jpg" width="35px" height="35px";/></div>
+                            <div class="vida_user_one">Post Title One</div>
+                            <div class="vida_conversation_button">
+                                <div class="vida_conversation_number">128</div>
+                            </div>
+                        </div>
+                    </li>
+                    <li>
+                        <div>
+                            <div><img src="images/steve1.jpg" width="35px" height="35px";/></div>
+                            <div class="vida_user_one">Post Title Two</div>
+                            <div class="vida_conversation_button">
+                                <div class="vida_conversation_number1">46</div>
+                            </div>
+                        </div>
+                    </li>
+                    <li>
+                        <div>
+                            <div><img src="images/steve2.jpg" width="35px" height="35px";/></div>
+                            <div class="vida_user_one">Post Title Three</div>
+                            <div class="vida_conversation_button">
+                                <div class="vida_conversation_number1">38</div>
+                            </div>
+                        </div>
+                    </li>
+                    <li>
+                        <div>
+                            <div><img src="images/images1.jpg" width="35px" height="35px";/></div>
+                            <div class="vida_user_one">Post Title Four</div>
+                            <div class="vida_conversation_button">
+                                <div class="vida_conversation_number1">24</div>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>         
+            
+            
+            <div data-role="footer" data-position="fixed" style="margin-top:-50px;margin-bottom:-50px">
+                <div data-role="navbar">
+                    <ul>
+                        <li><a href="#plaza_page" data-role="tab">
+                            <table>
+                                <tr>
+                                    <td style="padding-left:10px">
+                                        <img src="images/205-plaza_icon_active.png" width="30" height="25"/></td>
+                                </tr>
+                                <tr>
+                                    <td style="padding-left:12px">Plaza</td>
+                                </tr>
+                            </table>
+                        </a></li>
+                        
+                        <li><a href="#habla_page" data-role="tab">
+                            <table>
+                                <tr>
+                                    <td style="padding-left:10px">
+                                        <img src="images/206-habla_active.png" width="30" height="25"/></td>
+                                </tr>
+                                <tr>
+                                    
+                                    <td style="padding-left:12px">Habla</td>
+                                </tr>
+                            </table>
+                        </a></li>
+                        <li><a href="#vida_page" data-role="tab"  class="ui-btn-active">
+                            <table>
+                                <tr>
+                                    <td style="padding-left:10px">
+                                        <img src="images/207-vida.png" width="30" height="25"/></td>
+                                </tr>
+                                <tr>
+                                    <td style="padding-left:12px">Vida</td>
+                                </tr>
+                            </table>
+                        </a></li>
+                        <li><a href="#" data-role="tab">
+                            <table>
+                                <tr>
+                                    <td style="padding-left:10px">
+                                        <img src="images/208-activity_active.png" width="30" height="25"/></td>
+                                </tr>
+                                <tr>
+                                    <td style="padding-left:12px">Activity</td>
+                                </tr>
+                            </table>
+                        </a></a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <!--Activity page-->
+        <div id="activity_page" data-role="page">
+            <div class="activity_header">
+                <div class="plaza_comments">
+                    <img src="images/newupdatestatusbubble40x40.png"/>
+                </div>
+                <div class="activity_read_file">
+                    <img src="images/201-paper_stack.png"/>
+                </div>
+                
+                <div class="activity_header_logo">
+                    <img src="images/logo.png"/>
+                </div>
+                
+                <div class="activity_header_user">
+                    <img src="images/202-Friends.png"/>
+                </div>
+                
+                <div class="activity_filter_button">
+                    <img src="images/filterbutton40x40.png"/>
+                </div>
+            </div>
+            <div class="header_border"></div>
+            
+            <div class="activity_user_status_update" data-role="content">
+                <div class="activity_user_status_update_border">
+                    <div class="activity_user_status_update_image">
+                        <img src="images/anil.jpg" style="width:44px; height:44px;"/>
+                    </div>
+                </div>
+                
+                
+                <div class="activity_user_status_update_name"><h5>John<h5></div>
+                <div class="activity_user_status_update_post_data">Here is my status update for today u can display some text and hide the...</div>
+                
+                <div class="activity_user_status_box"/>
+                    <div class="activity_user_status_box_post">Just now</div>
+                    <div class="activity_user_status_box_camera">
+                        <img src="images/activitycamera.png"/>
+                    </div>
+                
+                    <div class="activity_image_star"><img src="images/appreciatefullpost40.png" style="width:15px; height:15px;"/></div>
+                    <div class="activity_post4">22</div>
+                    <div class="activity_image1"><img src="images/commentfullpost40.png" style="width:15px; height:15px;"/></div>
+                    <div class="activity_post5">12</div>
+                </div>
+                <div class="activity_user_status_update_border1">
+                    <div class="activity_user_status_update_image1">
+                        <img src="images/house.jpg" style="width:44px; height:44px;"/>
+                    </div>
+                </div>
+            </div> 
+        <div class="activity_comment_box" data-role="content">
+            <div class="activity_comment_border">
+                <div class="activity_comment_image">
+                    <img src="images/mukesh.jpg" style="width:44px; height:44px;"/>
+                </div>
+            </div>
+            
+            
+            <div class="activity_comment_name"><h5>John B | Comment<h5></div>
+            <div class="activity_comment_post"><p>Post One</p></div>
+            
+            <div class="activity_comment_icon">
+                <img src="images/commentfullpost40.png"/>
+            </div>
+        </div>
+        <div class="activity_appreciate_box" data-role="content">
+            <div class="activity_appreciate_border">
+                <div class="activity_appreciate_image">
+                    <img src="images/obama.jpg" style="width:44px; height:44px;"/>
+                </div>
+            </div>
+            
+            
+            <div class="activity_appreciate_name"><h5>Bobby B. Appreciates Your Post<h5></div>
+            <div class="activity_appreciate_post"><p>Post Two</p></div>
+        </div>
+        <div class="activity_conversation_box" data-role="content">
+            <div class="activity_conversation_border">
+                <div class="activity_conversation_image">
+                    <img src="images/bil.jpg" style="width:44px; height:44px;"/>
+                </div>
+            </div>
+            
+            
+            <div class="activity_conversation_name"><h5>John B<h5></div>
+            <div class="activity_conversation_post"><p>Post Title Here</p></div>
+            
+            <div class="activity_conversation_icon">
+                <img src="images/activityconversationbubble.png"/>
+            </div>
+        </div>
+        
+        <div class="activity_conversation_box" data-role="content">
+            <div class="activity_conversation_border">
+                <div class="activity_conversation_image">
+                    <img src="images/bil.jpg" style="width:44px; height:44px;"/>
+                </div>
+            </div>
+            
+            
+            <div class="activity_conversation_name"><h5>John B<h5></div>
+            <div class="activity_conversation_post"><p>Post Title Here</p></div>
+            
+            <div class="activity_conversation_icon">
+                <img src="images/activityconversationbubble.png"/>
+            </div>
+        </div>
+
+
+            <div data-role="footer" data-position="fixed" style="margin-top:-50px;margin-bottom:-50px;">
+                <div data-role="navbar">
+                    <ul>
+                        <li><a href="#plaza_page" data-role="tab">
+                            <table>
+                                <tr>
+                                    <td style="padding-left:10px">
+                                        <img src="images/205-plaza_icon_active.png" width="30" height="25"/></td>
+                                </tr>
+                                <tr>
+                                    <td style="padding-left:12px">Plaza</td>
+                                </tr>
+                            </table>
+                        </a></li>
+                        
+                        <li><a href="#habla_page" data-role="tab">
+                            <table>
+                                <tr>
+                                    <td style="padding-left:10px">
+                                        <img src="images/206-habla_active.png" width="30" height="25"/></td>
+                                </tr>
+                                <tr>
+                                    
+                                    <td style="padding-left:12px">Habla</td>
+                                </tr>
+                            </table>
+                        </a></li>
+                        <li><a href="#vida_page" data-role="tab">
+                            <table>
+                                <tr>
+                                    <td style="padding-left:10px">
+                                        <img src="images/207-vida.png" width="30" height="25"/></td>
+                                </tr>
+                                <tr>
+                                    <td style="padding-left:12px">Vida</td>
+                                </tr>
+                            </table>
+                        </a></li>
+                        <li><a href="#" data-role="tab"  class="ui-btn-active">
+                            <table>
+                                <tr>
+                                    <td style="padding-left:10px">
+                                        <img src="images/208-activity_active.png" width="30" height="25"/></td>
+                                </tr>
+                                <tr>
+                                    <td style="padding-left:12px">Activity</td>
+                                </tr>
+                            </table>
+                        </a></a></li>
+                    </ul>
+                </div>
+            </div>
+
+            
+        </div>
+        <!--Post title1(Appreciate Page) -->
+        <div id="appreciate_page" data-role="page">
+            <div id="back">
+                <div class="header1" data-role="content">
+                    <div class="search" data-role="content">
+                        <img src="images/203-BG.png" width="40" height="28"/>
+                    </div>
+                    <div class="search1" data-role="content">
+                        <img src="images/209-search_icon.png" width="40" height="28"/>
+                    </div>
+                    <div class="read_file1" data-role="content">
+                        <img src="images/201-paper_stack.png" width="30" height="30"/>
+                    </div>
+                    <div class="logo1" data-role="content">
+                        <img src="images/logo.png" width="120" height="25"/>
+                    </div>
+                    <div class="user1" data-role="content">
+                        <img src="images/202-Friends.png" width="30" height="30"/>
+                    </div>
+                    <div class="settings2" data-role="content">
+                        <img src="images/203-BG.png" width="40" height="28"/>
+                    </div>
+                    <div class="settings3" data-role="content">
+                        <img src="images/204-list_icon.png" width="48" height="28"/>
+                    </div>
+                </div> 
+                <div class="header_border"></div>
+                <div class="post_boxes4" data-role="content">
+                    <div class="post_boxes5" data-role="content">
+                        <div class="user_image" data-role="content">
+                            <img src="images/images.jpg" width="60" height="60"/>
+                        </div>
+                        <div class="user_name">ProfileOne</div>
+                        <div class="time">2 hours ago</div>
+                        <div class="category">Sports</div>
+                        <div class="appreciate">Appreciate</div>
+                        <div class="interest_counter" data-role="content">
+                            <img src="images/28-star.png" width="45" height="45"/>
+                        </div>
+                        <div class="comments">Comments</div>
+                        <div class="comment_counter" data-role="content">
+                            <img src="images/08-chat.png" width="40" height="40"/>
+                        </div>
+                    </div>
+                    <div class="post_title1">Post Title1</div>
+                    <div class="post_data1">This style will give you some room to have more text displayed and asdjyeyhdjddu jfhegtdyc baffirir mjkfid jdhdu bddtee nmkdldod nsaabdhf mfkfjrrbch mkfldfgf hfjdndbcyrhndbjd mdkkfiffhfbd njfhydbxjdj dndhdj.
+                    </div>
+                    <div class="set_border1">
+                        <div class="post_image1"><img src="images/images9.jpg" style="width:140px; height:120px;"/>
+                        </div>
+                    </div>
+                    
+                    <div class="flag" data-role="content">
+                        
+                    </div>
+                </div> 
+                
+                
+                <div data-role="footer" data-position="fixed" style="margin-top:-50px;margin-bottom:-50px">
+                    <div data-role="navbar">
+                        <ul>
+                            <li><a href="#appreciate_page" data-role="tab" class="ui-btn-active">
+                                <table>
+                                    <tr>
+                                        <td style="padding-left:1px">
+                                            <img src="images/28-star.png"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding-left:1px">Appreciate</td>
+                                    </tr>
+                                </table>
+                            </a></li>
+                            
+                            <li><a href="#" data-role="tab">
+                                <table>
+                                    <tr>
+                                        <td style="padding-left:10px">
+                                            <img src="images/02-redo.png"></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding-left:12px">Oye</td>
+                                    </tr>
+                                </table>
+                            </a></li>
+                            <li><a href="#comments_page" data-role="tab">
+                                <table>
+                                    <tr>
+                                        <td style="padding-left:10px">
+                                            <img src="images/08-chat.png"></td>
+                                    </tr>
+                                    
+                                    <tr>
+                                        
+                                            <td style="padding-left:12px">Comments</td>
+                                       
+                                    </tr>
+
+                                </table>
+                            </a></li>
+                            <li><a href="#" data-role="tab">
+                                <table>
+                                    <tr>
+                                        <td style="padding-left:10px">
+                                            <img src="images/12-eye.png"></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding-left:12px">Watch</td>
+                                    </tr>
+                                </table>
+                            </a></a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+        <!-- comments -->
+        <div id="comments_page" data-role="page">
+                <div class="header2" data-role="content">
+                    <div class="back_button" data-role="content">
+                        <img src="images/back.png" width="48" height="35"/>
+                    </div>
+                    <div class="read_file2" data-role="content">
+                        <img src="images/201-paper_stack.png" width="30" height="30"/>
+                    </div>
+                    <div class="logo2" data-role="content">
+                        <img src="images/logo.png" width="120" height="25"/>
+                    </div>
+                    <div class="user2" data-role="content">
+                        <img src="images/202-Friends.png" width="30" height="30"/>
+                    </div>
+                    <div class="settings4" data-role="content">
+                        <img src="images/203-BG.png" width="40" height="28"/>
+                    </div>
+                    <div class="settings5" data-role="content">
+                        <img src="images/204-list_icon.png" width="48" height="28"/>
+                    </div>
+                </div> 
+                <div class="header_border"></div>
+                <div class="filter_bar4" data-role="content">
+                    <div class="user_image2" data-role="content">
+                        <img src="images/steve.jpg" width="55" height="55"/>
+                    </div>
+                    <div class="title_bar2">Post Title</div>
+                    <div class="time2">2 hours ago</div>
+                    <div class="category2">Sports</div>
+                </div>
+                <div class="filter_bar5" data-role="content">
+                    <div class="appreciate2">Appreciate</div>
+                </div> 
+                <div class="interest_counter2" data-role="content">
+                    <img src="images/28-star.png" width="50" height="50"/>
+                    <div class="number2">24</div>
+                </div>
+                <div class="filter_bar6" data-role="content">
+                    <div class="comment_bar2" data-role="content"></div>
+                    <div class="add_comment2" data-role="content">Add Comment . . .</div>
+                </div>
+                <div class="post_box2" data-role="content">
+                    <div class="set_border2">
+                        <div class="post_image2"><img src="images/steve1.jpg" style="width:52px; height:52px;"/>
+                        </div>
+                        <div class="post_data2">This style will give you some room to have more text displayed and this style will you give some.</div>
+                        <div class="post6">John Henny</div>
+                        <div class="replyto_button2"><img src="images/09-chat-2.png"/></div>
+                    </div>
+                </div>
+                <div class="post_box3" data-role="content">
+                    <div class="post_data3">This style will give you some room to have more text displayed and this style will you give some room.</div>
+                    <div class="post7">BobbyH</div>
+                    <div class="set_border3">
+                        <div class="post_image3"><img src="images/steve2.jpg" style="width:52px; height:52px;"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="post_box4" data-role="content">
+                    <div class="set_border4">
+                        <div class="post_image5"><img src="images/images.jpg" style="width:52px; height:52px;"/>
+                        </div>
+                        <div class="post_data4">This style will give you some room to have more text displayed and this style will you give some room.</div>
+                        <div class="post8">John Henny</div>
+                        <div class="replyto_button3"><img src="images/09-chat-2.png"/></div>
+                    </div>
+                </div>
+                
+                
+                <div data-role="footer" data-position="fixed" style="margin-top:-50px;margin-bottom:-50px">
+                    <div data-role="navbar">
+                        <ul>
+                            <li><a href="#appreciate_page" data-role="tab">
+                                <table>
+                                    <tr>
+                                        <td style="padding-left:1px">
+                                            <img src="images/28-star.png"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding-left:1px">Appreciate</td>
+                                    </tr>
+                                </table>
+                            </a></li>
+                            
+                            <li><a href="#" data-role="tab">
+                                <table>
+                                    <tr>
+                                        <td style="padding-left:10px">
+                                            <img src="images/02-redo.png"></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding-left:12px">Oye</td>
+                                    </tr>
+                                </table>
+                            </a></li>
+                            <li><a href="#comments_page" data-role="tab" class="ui-btn-active">
+                                <table>
+                                    <tr>
+                                        <td style="padding-left:10px">
+                                            <img src="images/08-chat.png"></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding-left:12px">Comment</td>
+                                    </tr>
+                                </table>
+                            </a></li>
+                            <li><a href="#" data-role="tab">
+                                <table>
+                                    <tr>
+                                        <td style="padding-left:10px">
+                                            <img src="images/12-eye.png"></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding-left:12px">Watch</td>
+                                    </tr>
+                                </table>
+                            </a></a></li>
+                        </ul>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+
+                
+<!--facebook page -->
+        <div id="facebook-page" data-role="content">
+            <div data-role="header" data-position="fixed">
+                <a href="#" data-icon="arrow-l" data-iconpos="left" data-rel="back" data-transition="slide" data-direction="reverse">Back</a>
+            </div>
+        </div>
+   
+                <!--/////////////////-->
+        <script src="js/jquery.js"> </script>
+        <script src="js/jquery.mobile-1.0rc1.min.js"></script>
+        <script>
+            
+            $("a[data-role=tab]").each(function () {
+                                       var anchor = $(this);
+                                       anchor.bind("click", function () {
+                                                   $.mobile.changePage(anchor.attr("href"), {
+                                                                       transition: "none",
+                                                                       changeHash: false
+                                                                       });
+                                                   return false;
+                                                   });
+                                       });
+            
+            $("div[data-role=page]").bind("pagebeforeshow", function (e, data) {
+                                          $.mobile.silentScroll(0);
+                                          $.mobile.changePage.defaults.transition = 'slide';
+                                          });
+            </script>
+        <!-- facebook script -->
+        
+        <script>
+            if ((typeof Cordova == 'undefined') || (typeof cordova == 'undefined')) alert('Cordova variable does not exist. Check that you have included cordova.js correctly');
+            if (typeof CDV == 'undefined') alert('CDV variable does not exist. Check that you have included pg-plugin-fb-connect.js correctly');
+            if (typeof FB == 'undefined') alert('FB variable does not exist. Check that you have included the Facebook JS SDK file.');
+            
+            document.addEventListener('deviceready', function() {
+                                      try {
+                                      //alert('Device is ready! Make sure you set your app_id below this alert.');
+                                      FB.init({ appId: "273476932664248", nativeInterface: CDV.FB, useCachedDialogs: false });
+                                      } catch (e) {
+                                      alert(e);
+                                      }
+                                      }, false);
+            </script>
+
+    </body>
+    
+</html>
+            
+
+
